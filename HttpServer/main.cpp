@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <regex>
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include "double_pendulum.hpp"
@@ -31,11 +33,28 @@ std::string solve(int steps) {
 }
 
 std::string response(std::string data) {
-    std::string headers = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: ";
+    std::string headers = "HTTP/1.1 200 OK\nContent-Type: text/plain\nAccess-Control-Allow-Origin: *\nContent-Length: ";
     int length = data.length();
     std::string result = headers + std::to_string(length) + "\n\n";
     result += data;
     return result;
+}
+
+std::vector<std::string> splitter(std::string in_pattern, std::string& content){
+    std::vector<std::string> split_content;
+
+    std::regex pattern(in_pattern);
+    copy(std::sregex_token_iterator(content.begin(), content.end(), pattern, -1),
+         std::sregex_token_iterator(),back_inserter(split_content));
+    return split_content;
+}
+
+void parseBody(char requestBuffer[]) {
+    std::string request = std::string(requestBuffer, sizeof(requestBuffer));
+    std::vector<std::string> lines = splitter(R"(\n)", request);
+    for (int i = 0, length = sizeof(lines); i < length; i++) {
+        printf(lines[i].c_str());
+    }
 }
 
 
@@ -86,7 +105,8 @@ int main(int argc, char const *argv[])
         
         char buffer[30000] = {0};
         valread = read( new_socket , buffer, 30000);
-        printf("%s\n",buffer );
+        parseBody(buffer);
+//        printf("%s\n",buffer );
         write(new_socket , response.c_str(), response.length());
         printf("------------------ Data sent -------------------\n");
         close(new_socket);
