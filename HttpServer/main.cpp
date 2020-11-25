@@ -11,6 +11,33 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <iostream>
+#include <string>
+#include "double_pendulum.hpp"
+
+std::string solve(int steps) {
+    dp::state st{{3.14, 1.5}, {0, 0}};
+    dp::system ss{{1, 1}, {2, 3}};
+
+    int k = 0;
+    std::string result = "";
+    
+    while (k < steps){
+       k++;
+       result += std::to_string(st.theta.first) + ";" + std::to_string(st.theta.second) + "\n";
+       st = dp::advance(st, ss, 0.2);
+    }
+    return result;
+}
+
+std::string response(std::string data) {
+    std::string headers = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: ";
+    int length = data.length();
+    std::string result = headers + std::to_string(length) + "\n\n";
+    result += data;
+    return result;
+}
+
 
 #define PORT 8080
 int main(int argc, char const *argv[])
@@ -19,7 +46,7 @@ int main(int argc, char const *argv[])
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     
-    char const *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+    
     
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -54,13 +81,16 @@ int main(int argc, char const *argv[])
             perror("In accept");
             exit(EXIT_FAILURE);
         }
+        std::string simData = solve(100);
+        std::string response = ::response(simData);
         
         char buffer[30000] = {0};
         valread = read( new_socket , buffer, 30000);
         printf("%s\n",buffer );
-        write(new_socket , hello , strlen(hello));
-        printf("------------------Hello message sent-------------------\n");
+        write(new_socket , response.c_str(), response.length());
+        printf("------------------ Data sent -------------------\n");
         close(new_socket);
     }
     return 0;
 }
+
