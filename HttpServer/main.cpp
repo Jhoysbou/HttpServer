@@ -22,8 +22,10 @@ std::string solve(const double* params) {
     
     std::pair<double, double> mass = {params[1], params[2]};
     std::pair<double, double> length = {params[3], params[4]};
+    std::pair<double, double> angle = {params[5], params[6]};
+    std::pair<double, double> speed = {params[7], params[8]};
     
-    dp::state st{{3.14, 1.5}, {0, 0}};
+    dp::state st{angle, speed};
     dp::system ss{mass, length};
 
     int k = 0;
@@ -48,41 +50,63 @@ std::string response(std::string data) {
 double* parseBody(char requestBuffer[]) {
     std::string request = std::string(requestBuffer);
     
-    long index = request.find("\r\n\r\n");
+    long index = request.find("\n\n");
     std::string requestBody = request.substr(index + 8);
-
-    
+        
     index = requestBody.find("steps");
-    long commaIndex = requestBody.find("\r\n");
+    long commaIndex = requestBody.find("\n");
     std::string steps = requestBody.substr(index + 8, commaIndex - index - 9);
     requestBody = requestBody.substr(commaIndex + 1);
     
     index = requestBody.find("l_1");
-    commaIndex = requestBody.find("\r\n");
+    commaIndex = requestBody.find("\n");
     std::string l_1 = requestBody.substr(index + 6, commaIndex - index - 7);
     requestBody = requestBody.substr(commaIndex + 1);
  
     index = requestBody.find("l_2");
-    commaIndex = requestBody.find("\r\n");
+    commaIndex = requestBody.find("\n");
     std::string l_2 = requestBody.substr(index + 6, commaIndex - index - 7);
     requestBody = requestBody.substr(commaIndex + 1);
     
     index = requestBody.find("m_1");
-    commaIndex = requestBody.find("\r\n");
+    commaIndex = requestBody.find("\n");
     std::string m_1 = requestBody.substr(index + 6, commaIndex - index - 7);
     requestBody = requestBody.substr(commaIndex + 1);
     
     index = requestBody.find("m_2");
-    commaIndex = requestBody.find("\r\n");
-    std::string m_2 = requestBody.substr(index + 6, commaIndex - index - 6);
+    commaIndex = requestBody.find("\n");
+    std::string m_2 = requestBody.substr(index + 6, commaIndex - index - 7);
+    requestBody = requestBody.substr(commaIndex + 1);
     
-
-    static double res[5];
+    index = requestBody.find("angle_1");
+    commaIndex = requestBody.find("\n");
+    std::string angle_1 = requestBody.substr(index + 6, commaIndex - index - 7);
+    requestBody = requestBody.substr(commaIndex + 1);
+    
+    index = requestBody.find("angle_2");
+    commaIndex = requestBody.find("\n");
+    std::string angle_2 = requestBody.substr(index + 6, commaIndex - index - 7);
+    requestBody = requestBody.substr(commaIndex + 1);
+    
+    index = requestBody.find("speed_1");
+    commaIndex = requestBody.find("\n");
+    std::string speed_1 = requestBody.substr(index + 6, commaIndex - index - 7);
+    requestBody = requestBody.substr(commaIndex + 1);
+    
+    index = requestBody.find("speed_2");
+    commaIndex = requestBody.find("\n");
+    std::string speed_2 = requestBody.substr(index + 6, commaIndex - index - 6);
+    
+    static double res[9];
     res[0] = std::stod(steps);
     res[1] = std::stod(l_1);
     res[2] = std::stod(l_2);
     res[3] = std::stod(m_1);
     res[4] = std::stod(m_2);
+    res[5] = std::stod(angle_1);
+    res[6] = std::stod(angle_2);
+    res[7] = std::stod(speed_1);
+    res[8] = std::stod(speed_2);
 
     return res;
 }
