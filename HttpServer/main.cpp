@@ -50,6 +50,7 @@ std::string response(std::string data) {
 }
 
 double* parseBody(char requestBuffer[]) {
+    std::cout << requestBuffer << std::endl;
     std::string request = std::string(requestBuffer);
     static double res[9];
     std::regex regex ("\".{3,7}\":.{1,4}[,}]");
