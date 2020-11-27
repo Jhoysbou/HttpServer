@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <regex>
+#include <map>
 #include "double_pendulum.hpp"
 
 std::string solve(const double* params) {
@@ -49,64 +51,44 @@ std::string response(std::string data) {
 
 double* parseBody(char requestBuffer[]) {
     std::string request = std::string(requestBuffer);
-    
-    long index = request.find("\n\n");
-    std::string requestBody = request.substr(index + 8);
-        
-    index = requestBody.find("steps");
-    long commaIndex = requestBody.find("\n");
-    std::string steps = requestBody.substr(index + 8, commaIndex - index - 9);
-    requestBody = requestBody.substr(commaIndex + 1);
-    
-    index = requestBody.find("l_1");
-    commaIndex = requestBody.find("\n");
-    std::string l_1 = requestBody.substr(index + 6, commaIndex - index - 7);
-    requestBody = requestBody.substr(commaIndex + 1);
- 
-    index = requestBody.find("l_2");
-    commaIndex = requestBody.find("\n");
-    std::string l_2 = requestBody.substr(index + 6, commaIndex - index - 7);
-    requestBody = requestBody.substr(commaIndex + 1);
-    
-    index = requestBody.find("m_1");
-    commaIndex = requestBody.find("\n");
-    std::string m_1 = requestBody.substr(index + 6, commaIndex - index - 7);
-    requestBody = requestBody.substr(commaIndex + 1);
-    
-    index = requestBody.find("m_2");
-    commaIndex = requestBody.find("\n");
-    std::string m_2 = requestBody.substr(index + 6, commaIndex - index - 7);
-    requestBody = requestBody.substr(commaIndex + 1);
-    
-    index = requestBody.find("angle_1");
-    commaIndex = requestBody.find("\n");
-    std::string angle_1 = requestBody.substr(index + 6, commaIndex - index - 7);
-    requestBody = requestBody.substr(commaIndex + 1);
-    
-    index = requestBody.find("angle_2");
-    commaIndex = requestBody.find("\n");
-    std::string angle_2 = requestBody.substr(index + 6, commaIndex - index - 7);
-    requestBody = requestBody.substr(commaIndex + 1);
-    
-    index = requestBody.find("speed_1");
-    commaIndex = requestBody.find("\n");
-    std::string speed_1 = requestBody.substr(index + 6, commaIndex - index - 7);
-    requestBody = requestBody.substr(commaIndex + 1);
-    
-    index = requestBody.find("speed_2");
-    commaIndex = requestBody.find("\n");
-    std::string speed_2 = requestBody.substr(index + 6, commaIndex - index - 6);
-    
     static double res[9];
-    res[0] = std::stod(steps);
-    res[1] = std::stod(l_1);
-    res[2] = std::stod(l_2);
-    res[3] = std::stod(m_1);
-    res[4] = std::stod(m_2);
-    res[5] = std::stod(angle_1);
-    res[6] = std::stod(angle_2);
-    res[7] = std::stod(speed_1);
-    res[8] = std::stod(speed_2);
+    std::regex regex ("\".{3,7}\":.{1,4}[,}]");
+    std::string temp;
+    std::map<std::string, std::string> params;
+
+    
+    std::regex_token_iterator<std::string::iterator> rend;
+    std::regex_token_iterator<std::string::iterator> a (request.begin(), request.end(), regex);
+    
+    long fIndex;
+    long eIndex;
+    bool isCommaExists;
+    std::string key;
+    std::string value;
+
+    while (a!=rend) {
+        temp = *a++;
+        fIndex = temp.find("\"");
+        eIndex = temp.substr(fIndex+1).find("\"");
+        key = temp.substr(fIndex+1, eIndex - fIndex);
+       
+        isCommaExists = temp.find(",") != -1 || temp.find("}") != -1;
+        value = temp.substr(eIndex + 3);
+        if (isCommaExists)
+            value.pop_back();
+
+        params.insert({key, value});
+    }
+            
+    res[0] = std::stod(params["steps"]);
+    res[1] = std::stod(params["l_1"]);
+    res[2] = std::stod(params["l_2"]);
+    res[3] = std::stod(params["m_1"]);
+    res[4] = std::stod(params["m_2"]);
+    res[5] = std::stod(params["angle_1"]);
+    res[6] = std::stod(params["angle_2"]);
+    res[7] = std::stod(params["speed_1"]);
+    res[8] = std::stod(params["speed_2"]);
 
     return res;
 }
@@ -114,6 +96,8 @@ double* parseBody(char requestBuffer[]) {
 
 #define PORT 8080
 int main(int argc, char const *argv[]) {
+//    char buffer[] = "POST / HTTP/1.1\r\nHost: localhost:8080\r\nConnection: keep-alive\r\nContent-Length: 98\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36\r\nDNT: 1\r\nContent-Type: text/plain;charset=UTF-8\r\nAccept: */*\r\nOrigin: null\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-Mode: cors\r\nSec-Fetch-Dest: empty\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9,ru;q=0.8\r\n\r\n{\"steps\":200,\"l_1\":1,\"l_2\":1,\"m_1\":1,\"m_2\":1,\"angle_1\":3.14,\"angle_2\":1.5,\"speed_1\":0,\"speed_2\":0}";
+//    parseBody(buffer);
     int server_fd, new_socket; long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
@@ -149,7 +133,7 @@ int main(int argc, char const *argv[]) {
             perror("In accept");
             exit(EXIT_FAILURE);
         }
-       
+
 
         char buffer[30000] = {0};
         valread = read( new_socket , buffer, 30000);
