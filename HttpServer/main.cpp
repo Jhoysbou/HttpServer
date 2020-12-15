@@ -19,14 +19,14 @@
 #include <map>
 #include "../../MathModel2020/c++/double_pendulum.hpp"
 
-std::string solve(const double* params) {
-    int steps = params[0];
+std::string solve(std::map<std::string, double> paramMap) {
+    int steps = paramMap["steps"];
     
-    std::pair<double, double> mass = {params[1], params[2]};
-    std::pair<double, double> length = {params[3], params[4]};
-    std::pair<double, double> angle = {params[5], params[6]};
-    std::pair<double, double> speed = {params[7], params[8]};
-    
+    std::pair<double, double> mass = {paramMap["m_1"], paramMap["m_2"]};
+    std::pair<double, double> length = {paramMap["l_1"], paramMap["l_2"]};
+    std::pair<double, double> angle = {paramMap["angle_1"], paramMap["angle_2"]};
+    std::pair<double, double> speed = {paramMap["speed_1"], paramMap["speed_2"]};
+        
     dp::state st{angle, speed};
     dp::system ss{mass, length};
 
@@ -49,13 +49,12 @@ std::string response(std::string data) {
     return result;
 }
 
-double* parseBody(char requestBuffer[]) {
+std::map<std::string, double> parseBody(char requestBuffer[]) {
     std::cout << requestBuffer << std::endl;
     std::string request = std::string(requestBuffer);
-    static double res[9];
     std::regex regex ("\".{3,7}\":.{1,4}[,}]");
     std::string temp;
-    std::map<std::string, std::string> params;
+    std::map<std::string, double> params;
 
     
     std::regex_token_iterator<std::string::iterator> rend;
@@ -77,21 +76,11 @@ double* parseBody(char requestBuffer[]) {
         value = temp.substr(eIndex + 3);
         if (isCommaExists)
             value.pop_back();
-
-        params.insert({key, value});
+        std::cout << value << std::endl;
+        params.insert({key, std::stod(value)});
     }
-            
-    res[0] = std::stod(params["steps"]);
-    res[1] = std::stod(params["l_1"]);
-    res[2] = std::stod(params["l_2"]);
-    res[3] = std::stod(params["m_1"]);
-    res[4] = std::stod(params["m_2"]);
-    res[5] = std::stod(params["angle_1"]);
-    res[6] = std::stod(params["angle_2"]);
-    res[7] = std::stod(params["speed_1"]);
-    res[8] = std::stod(params["speed_2"]);
 
-    return res;
+    return params;
 }
 
 
@@ -139,7 +128,7 @@ int main(int argc, char const *argv[]) {
 
         char buffer[30000] = {0};
         valread = read( new_socket , buffer, 30000);
-        double* params = parseBody(buffer);
+        std::map<std::string, double> params = parseBody(buffer);
         std::string simData = solve(params);
         std::string response = ::response(simData);
 //        printf("%s\n",buffer );
