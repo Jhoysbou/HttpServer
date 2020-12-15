@@ -128,6 +128,7 @@ int main(int argc, char const *argv[]) {
         perror("In listen");
         exit(EXIT_FAILURE);
     }
+    
     while(1) {
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) {

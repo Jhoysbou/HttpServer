@@ -23,6 +23,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DD4400D525894DB200351615 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		DD586816256EEA0E00C7D219 /* HttpServer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpServer; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD586819256EEA0E00C7D219 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		DD586826256EF74400C7D219 /* double_pendulum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = double_pendulum.hpp; sourceTree = "<group>"; };
@@ -60,6 +61,7 @@
 			children = (
 				DD586819256EEA0E00C7D219 /* main.cpp */,
 				DD586826256EF74400C7D219 /* double_pendulum.hpp */,
+				DD4400D525894DB200351615 /* Makefile */,
 			);
 			path = HttpServer;
 			sourceTree = "<group>";
