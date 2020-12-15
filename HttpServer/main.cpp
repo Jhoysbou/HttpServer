@@ -17,7 +17,7 @@
 #include <string>
 #include <regex>
 #include <map>
-#include "double_pendulum.hpp"
+#include "../../MathModel2020/c++/double_pendulum.hpp"
 
 std::string solve(const double* params) {
     int steps = params[0];
