@@ -76,7 +76,6 @@ std::map<std::string, double> parseBody(char requestBuffer[]) {
         value = temp.substr(eIndex + 3);
         if (isCommaExists)
             value.pop_back();
-        std::cout << value << std::endl;
         params.insert({key, std::stod(value)});
     }
 
