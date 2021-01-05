@@ -1,7 +1,7 @@
 /HttpServer.xcodeproj/*
 *.cmake
 CMakeCache.txt
-/CMakeFiles
-main
+src/CMakeFiles
+src/HttpServer
 Makefile
 
