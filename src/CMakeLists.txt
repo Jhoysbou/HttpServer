@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.19)
 project(HttpServer)
 set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
+include_directories(../MathModel2020/c++)
 add_executable(HttpServer main.cpp)
