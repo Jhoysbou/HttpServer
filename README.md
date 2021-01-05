@@ -3,7 +3,8 @@
 моделирования. 
 
 ## Setup
-- Скомпилировать исходники и запустить проект.
+- Склонировать репозиторий `git clone --recurse-submodules https://github.com/Jhoysbou/HttpServer.git`
+- Сгенерировать Makefile `cmake`
+- Скомпилировать исходники `make`
+- Запусть приложение `main`
 - Страница будет доступна на http://localhost:8085
-
-
