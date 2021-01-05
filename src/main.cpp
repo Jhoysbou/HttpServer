@@ -14,10 +14,11 @@
 #include <regex>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <regex>
 #include <map>
-#include "/MathModel2020/c++/double_pendulum.hpp"
+#include "../MathModel2020/c++/double_pendulum.hpp"
 
 std::string solve(std::map<std::string, double> paramMap) {
     int steps = paramMap["steps"];
@@ -41,8 +42,8 @@ std::string solve(std::map<std::string, double> paramMap) {
     return result;
 }
 
-std::string response(std::string data) {
-    std::string headers = "HTTP/1.1 200 OK\nContent-Type: text/plain\nAccess-Control-Allow-Origin: *\nContent-Length: ";
+std::string response(std::string data, std::string contentType) {
+    std::string headers = "HTTP/1.1 200 OK\nContent-Type: " + contentType + "\nAccess-Control-Allow-Origin: *\nContent-Length: ";
     long length = data.length();
     std::string result = headers + std::to_string(length) + "\n\n";
     result += data;
@@ -82,8 +83,39 @@ std::map<std::string, double> parseBody(char requestBuffer[]) {
     return params;
 }
 
+char* readHtml() {
+    std::ifstream file("index.html", std::ios::binary | std::ios::ate);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
 
-#define PORT 8080
+    static std::vector<char> buffer(size);
+    if (file.read(buffer.data(), size))
+    {
+        return &buffer[0];
+    }
+    return "Internal error! Cannot read html file";
+}
+
+std::string handleRoutes(char buffer[]) {
+    std::string request = std::string(buffer);
+    std::smatch m;
+    std::regex regexGet ("GET / .*");
+    std::regex regexPost ("POST / .*");
+    std::string response = "404";
+    
+    if (std::regex_search(request, m, regexGet)) {
+        response = ::response(readHtml(), "text/html");
+    } else if (std::regex_search(request, m, regexPost)) {
+        std::map<std::string, double> params = parseBody(buffer);
+        std::string simData = solve(params);
+        response = ::response(simData, "text/plain");
+    }
+    
+    return response;
+}
+
+
+#define PORT 8085
 int main(int argc, char const *argv[]) {
 //    char buffer[] = "POST / HTTP/1.1\r\nHost: localhost:8080\r\nConnection: keep-alive\r\nContent-Length: 98\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36\r\nDNT: 1\r\nContent-Type: text/plain;charset=UTF-8\r\nAccept: */*\r\nOrigin: null\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-Mode: cors\r\nSec-Fetch-Dest: empty\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9,ru;q=0.8\r\n\r\n{\"steps\":200,\"l_1\":1,\"l_2\":1,\"m_1\":1,\"m_2\":1,\"angle_1\":3.14,\"angle_2\":1.5,\"speed_1\":0,\"speed_2\":0}";
 //    parseBody(buffer);
@@ -124,12 +156,9 @@ int main(int argc, char const *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-
         char buffer[30000] = {0};
-        valread = read( new_socket , buffer, 30000);
-        std::map<std::string, double> params = parseBody(buffer);
-        std::string simData = solve(params);
-        std::string response = ::response(simData);
+        valread = read(new_socket , buffer, 30000);
+        std::string response = handleRoutes(buffer);
 //        printf("%s\n",buffer );
         write(new_socket , response.c_str(), response.length());
         printf("------------------ Data sent -------------------\n");
