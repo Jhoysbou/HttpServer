@@ -117,8 +117,6 @@ std::string handleRoutes(char buffer[]) {
 
 #define PORT 8085
 int main(int argc, char const *argv[]) {
-//    char buffer[] = "POST / HTTP/1.1\r\nHost: localhost:8080\r\nConnection: keep-alive\r\nContent-Length: 98\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36\r\nDNT: 1\r\nContent-Type: text/plain;charset=UTF-8\r\nAccept: */*\r\nOrigin: null\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-Mode: cors\r\nSec-Fetch-Dest: empty\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9,ru;q=0.8\r\n\r\n{\"steps\":200,\"l_1\":1,\"l_2\":1,\"m_1\":1,\"m_2\":1,\"angle_1\":3.14,\"angle_2\":1.5,\"speed_1\":0,\"speed_2\":0}";
-//    parseBody(buffer);
     int server_fd, new_socket; long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
