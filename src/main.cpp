@@ -83,8 +83,8 @@ std::map<std::string, double> parseBody(char requestBuffer[]) {
     return params;
 }
 
-char* readHtml() {
-    std::ifstream file("index.html", std::ios::binary | std::ios::ate);
+std::string readHtml() {
+    std::ifstream file("MathModel2020/model/index.html", std::ios::binary | std::ios::ate);
     std::streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
 
