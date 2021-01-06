@@ -6,7 +6,7 @@
 - Склонировать репозиторий `git clone --recurse-submodules https://github.com/Jhoysbou/HttpServer.git`
 - Сгенерировать Makefile `cmake .`
 - Скомпилировать исходники `make`
-- Запусть приложение `main`
+- Запусть приложение `HttpServer`
 - Страница будет доступна на http://localhost:8085
 
 
